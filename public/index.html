@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GoBus - Pesan Tiket Bus Online Terpercaya</title>
+  <meta name="description" content="Pesan tiket bus online lebih mudah dengan GoBus. Harga terbaik, aman, dan terpercaya untuk seluruh rute di Indonesia.">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <div class="logo">🚌 Go<span>Bus</span></div>
+    <div class="nav-links">
+      <a href="index.html" class="active">Pesan Tiket</a>
+      <a href="rute.html">Rute</a>
+      <a href="#promo">Penawaran</a>
+      <a href="contact.html">Bantuan</a>
+    </div>
+    <div class="nav-right">
+      <a href="#" class="btn-login" onclick="openAuthModal('login', event)">Masuk</a>
+      <a href="#" class="btn btn-nav" onclick="openAuthModal('register', event)">Daftar</a>
+    </div>
+    <div class="nav-toggle" id="navToggle">☰</div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <div class="container hero-text">
+      <h1>Pesan Tiket Bus Lebih Mudah dengan GoBus</h1>
+      <p>Harga terbaik, aman, dan terpercaya. Perjalanan melintasi ribuan rute dengan armada premium dan mitra terverifikasi kami.</p>
+    </div>
+  </section>
+
+  <!-- SEARCH BOX SECTION -->
+  <section class="search-section">
+    <div class="container">
+      <div class="search-box">
+        <div class="search-grid">
+          <!-- Kota Asal -->
+          <div class="form-group">
+            <label>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+              Asal
+            </label>
+            <div class="form-group-input-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+              <input type="text" id="searchOrigin" placeholder="Pilih Kota Asal" list="citiesList" autocomplete="off" required>
+            </div>
+          </div>
+          
+          <!-- Kota Tujuan -->
+          <div class="form-group">
+            <label>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+              Tujuan
+            </label>
+            <div class="form-group-input-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+              <input type="text" id="searchDestination" placeholder="Pilih Kota Tujuan" list="citiesList" autocomplete="off" value="Surabaya">
+            </div>
+          </div>
+
+          <!-- Tanggal Keberangkatan -->
+          <div class="form-group">
+            <label>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z"/></svg>
+              Tanggal Keberangkatan
+            </label>
+            <div class="form-group-input-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+              <input type="date" id="searchDate">
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button class="btn btn-primary btn-search" onclick="searchBuses()">Cari Tiket</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cities Data List for suggestions -->
+  <datalist id="citiesList">
+    <option value="Jakarta"></option>
+    <option value="Bandung"></option>
+    <option value="Surabaya"></option>
+    <option value="Yogyakarta"></option>
+    <option value="Semarang"></option>
+    <option value="Malang"></option>
+    <option value="Bali"></option>
+    <option value="Solo"></option>
+    <option value="Medan"></option>
+  </datalist>
+
+  <!-- FEATURES / WHY CHOOSE US -->
+  <section class="features-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Kenapa Pilih GoBus?</h2>
+        <p>Cara tercepat dan teraman untuk bepergian dengan bus.</p>
+      </div>
+      
+      <div class="features-grid">
+        <!-- Card 1 -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>
+          </div>
+          <h3>Pemesanan Mudah</h3>
+          <p>Pesan tempat duduk Anda dalam waktu kurang dari 2 menit.</p>
+        </div>
+        
+        <!-- Card 2 -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581a1.44 1.44 0 002.036 0l4.319-4.32a1.44 1.44 0 000-2.037L11.16 3.66a2.25 2.25 0 00-1.592-.659zM7.5 6h.008v.008H7.5V6z"/></svg>
+          </div>
+          <h3>Harga Terbaik</h3>
+          <p>Kami menawarkan harga yang kompetitif dan penawaran eksklusif.</p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751A11.959 11.959 0 0112 2.714z"/></svg>
+          </div>
+          <h3>Pembayaran Aman</h3>
+          <p>Transaksi Anda dilindungi oleh protokol keamanan terdepan di industri ini.</p>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/></svg>
+          </div>
+          <h3>E-Tiket Instan</h3>
+          <p>Dapatkan tiket Anda yang dikirim langsung ke ponsel dan email Anda segera setelah pemesanan.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POPULAR ROUTES -->
+  <section class="popular-section">
+    <div class="container">
+      <div class="popular-header">
+        <div class="title-area">
+          <h2>Rute Populer</h2>
+          <p>Pilihan utama dari pelancong kami bulan ini.</p>
+        </div>
+        <a href="search.html" class="btn-see-all">
+          Lihat Semua Rute
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+        </a>
+      </div>
+
+      <div class="routes-grid">
+        <!-- Route 1 -->
+        <div class="route-card" onclick="quickSearch('Jakarta', 'Bandung')">
+          <div class="route-image">
+            <span class="route-badge">BEST SELLER</span>
+            <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=600&q=80" alt="Jakarta - Bandung">
+          </div>
+          <div class="route-content">
+            <div class="route-cities">
+              <span>Jakarta</span>
+              <span class="arrow">→</span>
+              <span>Bandung</span>
+            </div>
+            <div class="route-price-area">
+              <span class="route-from">Mulai dari</span>
+              <span class="route-price">Rp100.000</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Route 2 -->
+        <div class="route-card" onclick="quickSearch('Surabaya', 'Malang')">
+          <div class="route-image">
+            <img src="https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&w=600&q=80" alt="Surabaya - Malang">
+          </div>
+          <div class="route-content">
+            <div class="route-cities">
+              <span>Surabaya</span>
+              <span class="arrow">→</span>
+              <span>Malang</span>
+            </div>
+            <div class="route-price-area">
+              <span class="route-from">Mulai dari</span>
+              <span class="route-price">Rp100.000</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Route 3 -->
+        <div class="route-card" onclick="quickSearch('Denpasar', 'Ubud')">
+          <div class="route-image">
+            <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=600&q=80" alt="Denpasar - Ubud">
+          </div>
+          <div class="route-content">
+            <div class="route-cities">
+              <span>Denpasar</span>
+              <span class="arrow">→</span>
+              <span>Ubud</span>
+            </div>
+            <div class="route-price-area">
+              <span class="route-from">Mulai dari</span>
+              <span class="route-price">Rp100.000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROMO BANNER SECTION -->
+  <section class="promo-section" id="promo">
+    <div class="container">
+      <div class="promo-banner">
+        <div class="promo-info">
+          <span class="promo-badge">PENAWARAN TERBATAS</span>
+          <h2>Diskon 30% untuk Perjalanan Pertama Anda!</h2>
+          <p>Nikmati perjalanan mewah dengan harga lebih hemat. Gunakan kode GOBUSNEW saat pembayaran untuk klaim diskon Anda.</p>
+          <div style="display:flex; align-items:center; flex-wrap:wrap; gap:1rem;">
+            <div class="promo-code-container">
+              <span class="promo-code-label">KODE:</span>
+              <span class="promo-code" id="promoCodeVal">GOBUSNEW</span>
+            </div>
+            <button class="btn btn-promo" onclick="copyPromoCode()">Lihat Promo</button>
+          </div>
+        </div>
+        <div class="promo-art">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:200px;height:200px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/></svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS SECTION -->
+  <section class="testimonials-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Dipercayai oleh Ribuan Pengguna</h2>
+        <p>Pilihan utama dari pelancong kami bulan ini.</p>
+      </div>
+
+      <div class="testimonials-grid">
+        <!-- Card 1 -->
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-text">"Aplikasi yang sangat membantu! Pesan tiket bus dari Jakarta ke Bandung jadi jauh lebih praktis dan cepat."</p>
+          <div class="user-profile">
+            <div class="user-avatar">AT</div>
+            <div class="user-info">
+              <h4>Alex Thompson</h4>
+              <p>Pelancong Aktif</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-text">"Harga tiket di GoBus sangat bersaing. Saya sering dapat promo menarik untuk rute Surabaya - Malang."</p>
+          <div class="user-profile">
+            <div class="user-avatar">SJ</div>
+            <div class="user-info">
+              <h4>Sarah Jenkins</h4>
+              <p>Nomaden Digital</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-text">"Pelayanan pelanggan yang responsif dan metode pembayaran yang sangat lengkap. Sangat terpercaya!"</p>
+          <div class="user-profile">
+            <div class="user-avatar">MC</div>
+            <div class="user-info">
+              <h4>Michael Chen</h4>
+              <p>Pelancong Bisnis</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <div class="logo">GoBus</div>
+        <p>Dapatkan info perjalanan dan penawaran terbaru.</p>
+        <div class="social-links">
+          <a href="#" class="social-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" style="width:18px;height:18px;"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z"/></svg>
+          </a>
+          <a href="#" class="social-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" style="width:18px;height:18px;"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          </a>
+          <a href="#" class="social-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" style="width:18px;height:18px;"><path d="M23.498 6.163a3.003 3.003 0 00-2.11-2.11C19.518 3.545 12 3.545 12 3.545s-7.517 0-9.388.508a3.003 3.003 0 00-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 002.11 2.11c1.871.508 9.388.508 9.388.508s7.518 0 9.388-.508a3.003 3.003 0 002.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-links">
+        <h4>Perusahaan</h4>
+        <ul>
+          <li><a href="#">Tentang Kami</a></li>
+          <li><a href="#">Hubungi Kami</a></li>
+          <li><a href="#">Jadi Mitra Kami</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Syarat & Ketentuan</a></li>
+          <li><a href="#">Kebijakan Privasi</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-newsletter">
+        <h4>Buletin</h4>
+        <p>Dapatkan info perjalanan dan penawaran terbaru.</p>
+        <div class="newsletter-form">
+          <input type="email" placeholder="Masukkan Email Anda" required id="newsletterEmail">
+          <button class="btn btn-subscribe" onclick="subscribeNewsletter()">Gabung</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="container footer-bottom">
+      <span>© 2024 GoBus. All rights reserved.</span>
+      <span>Platform Pemesanan Tiket Terpercaya</span>
+    </div>
+  </footer>
+
+  <!-- Toast notifications -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Set default search date to tomorrow
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toISOString().split('T')[0];
+      const dateInput = document.getElementById('searchDate');
+      if (dateInput) {
+        dateInput.value = tomorrowStr;
+        dateInput.min = new Date().toISOString().split('T')[0];
+      }
+    });
+
+    function toast(msg, type = 'success') {
+      const c = document.getElementById('toastContainer');
+      if (!c) return;
+      const t = document.createElement('div');
+      t.className = `toast ${type}`;
+      
+      const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+      t.innerHTML = `<span>${icons[type] || 'ℹ️'} ${msg}</span>`;
+      c.appendChild(t);
+      
+      setTimeout(() => {
+        t.style.animation = 'slideOut .3s ease forwards';
+        setTimeout(() => t.remove(), 300);
+      }, 3500);
+    }
+
+    function searchBuses() {
+      const origin = document.getElementById('searchOrigin').value.trim();
+      const dest = document.getElementById('searchDestination').value.trim();
+      const date = document.getElementById('searchDate').value;
+      
+      if (!origin || !dest || !date) {
+        toast('Lengkapi kota asal, tujuan, dan tanggal!', 'warning');
+        return;
+      }
+      
+      if (origin.toLowerCase() === dest.toLowerCase()) {
+        toast('Kota asal dan tujuan tidak boleh sama!', 'warning');
+        return;
+      }
+      
+      // Redirect to search results page with parameters
+      const params = new URLSearchParams({ origin, destination: dest, date });
+      window.location.href = `search.html?${params.toString()}`;
+    }
+
+    function quickSearch(origin, dest) {
+      document.getElementById('searchOrigin').value = origin;
+      document.getElementById('searchDestination').value = dest;
+      searchBuses();
+    }
+
+    function copyPromoCode() {
+      const code = document.getElementById('promoCodeVal').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        toast(`Kode promo ${code} berhasil disalin! Gunakan saat pembayaran untuk mendapatkan diskon 30%.`, 'success');
+      }).catch(() => {
+        toast('Gagal menyalin kode promo', 'error');
+      });
+    }
+
+    function subscribeNewsletter() {
+      const email = document.getElementById('newsletterEmail').value.trim();
+      if (!email || !email.includes('@')) {
+        toast('Masukkan alamat email yang valid!', 'warning');
+        return;
+      }
+      toast('Terima kasih! Anda telah bergabung dalam buletin GoBus.', 'success');
+      document.getElementById('newsletterEmail').value = '';
+    }
+
+    // Toggle nav
+    document.getElementById('navToggle')?.addEventListener('click', () => {
+      const navLinks = document.querySelector('.nav-links');
+      const navRight = document.querySelector('.nav-right');
+      if (navLinks.style.display === 'flex') {
+        navLinks.style.display = 'none';
+        navRight.style.display = 'none';
+      } else {
+        navLinks.style.display = 'flex';
+        navLinks.style.flexDirection = 'column';
+        navRight.style.display = 'flex';
+        navRight.style.flexDirection = 'column';
+        navLinks.style.position = 'absolute';
+        navLinks.style.top = '72px';
+        navLinks.style.left = '0';
+        navLinks.style.width = '100%';
+        navLinks.style.background = '#fff';
+        navLinks.style.padding = '1rem';
+        navLinks.style.borderBottom = '1px solid #e2e8f0';
+        navRight.style.position = 'absolute';
+        navRight.style.top = '220px';
+        navRight.style.left = '0';
+        navRight.style.width = '100%';
+        navRight.style.background = '#fff';
+        navRight.style.padding = '1rem';
+        navRight.style.borderBottom = '1px solid #e2e8f0';
+        navRight.style.zIndex = '100';
+      }
+    });
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>

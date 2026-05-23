@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rute & Pesanan Saya - GoBus</title>
+  <meta name="description" content="Lihat rute perjalanan dan riwayat pesanan tiket bus Anda di GoBus.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .page-header {
+      background: linear-gradient(135deg, var(--primary) 0%, #c0350a 100%);
+      padding: 3rem 0 2rem;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .page-header h1 { color: #fff; font-size: 2rem; margin-bottom: 0.5rem; }
+    .page-header p { color: rgba(255,255,255,0.8); font-size: 1rem; }
+    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); padding-bottom: 0; }
+    .tab-btn {
+      padding: 0.75rem 1.5rem; background: none; border: none; color: var(--muted);
+      font-weight: 600; font-size: 0.95rem; cursor: pointer; border-bottom: 3px solid transparent;
+      margin-bottom: -2px; transition: all 0.2s; font-family: inherit;
+    }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .booking-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 1.25rem 1.5rem; margin-bottom: 1rem; display: flex;
+      justify-content: space-between; align-items: center; gap: 1rem;
+      transition: box-shadow 0.2s;
+    }
+    .booking-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.12); }
+    .booking-route { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+    .booking-meta { font-size: 0.85rem; color: var(--muted); margin-top: 0.3rem; }
+    .booking-code { font-family: monospace; font-size: 0.85rem; color: var(--muted); }
+    .booking-price { font-size: 1.2rem; font-weight: 800; color: var(--primary); white-space: nowrap; }
+    .badge-status { padding: 0.3rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+    .badge-status.pending { background: rgba(255,214,0,0.15); color: #b8a000; }
+    .badge-status.paid { background: rgba(0,200,83,0.15); color: #00a844; }
+    .badge-status.failed { background: rgba(255,23,68,0.15); color: #e8001a; }
+    .badge-status.refunded { background: rgba(100,116,139,0.15); color: var(--muted); }
+    .empty-state { text-align: center; padding: 4rem 1rem; color: var(--muted); }
+    .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+    .route-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+    .route-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 1.25rem; transition: all 0.2s; cursor: pointer;
+    }
+    .route-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(232,66,10,0.15); }
+    .route-cities { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+    .route-arrow { color: var(--primary); }
+    .route-dist { font-size: 0.82rem; color: var(--muted); margin-top: 0.3rem; }
+    .login-prompt {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 3rem 2rem; text-align: center; margin: 2rem auto; max-width: 480px;
+    }
+    .login-prompt .icon { font-size: 3rem; margin-bottom: 1rem; }
+    .login-prompt h3 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+    .login-prompt p { color: var(--muted); margin-bottom: 1.5rem; }
+  </style>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <div class="logo">🚌 Go<span>Bus</span></div>
+    <div class="nav-links">
+      <a href="index.html">Pesan Tiket</a>
+      <a href="rute.html" class="active">Rute</a>
+      <a href="index.html#promo">Penawaran</a>
+      <a href="contact.html">Bantuan</a>
+    </div>
+    <div class="nav-right">
+      <a href="#" class="btn-login" onclick="openAuthModal('login', event)">Masuk</a>
+      <a href="#" class="btn btn-nav" onclick="openAuthModal('register', event)">Daftar</a>
+    </div>
+    <div class="nav-toggle" id="navToggle">☰</div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h1>🛣️ Rute & Pesanan</h1>
+    <p>Jelajahi rute tersedia dan pantau riwayat perjalanan Anda</p>
+  </div>
+
+  <main class="container" style="padding-bottom: 3rem;">
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('routes', this)">🗺️ Semua Rute</button>
+      <button class="tab-btn" onclick="switchTab('bookings', this)">🎫 Pesanan Saya</button>
+    </div>
+
+    <!-- TAB: ALL ROUTES -->
+    <div id="tab-routes" class="tab-panel active">
+      <div id="routesList" class="route-grid">
+        <div style="grid-column: 1/-1; text-align:center; color: var(--muted); padding: 2rem;">
+          Memuat rute...
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: MY BOOKINGS -->
+    <div id="tab-bookings" class="tab-panel">
+      <div id="bookingsContent">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+  </main>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <script src="script.js"></script>
+  <script>
+    // ─── TAB SWITCH ───────────────────────────────────────────────
+    function switchTab(tab, el) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      el.classList.add('active');
+
+      if (tab === 'bookings') loadMyBookings();
+    }
+
+    // ─── LOAD ALL ROUTES ─────────────────────────────────────────
+    async function loadAllRoutesPublic() {
+      const container = document.getElementById('routesList');
+      try {
+        const res = await fetch('/api/schedules/routes');
+        const json = await res.json();
+        if (!json.success || !json.data.length) {
+          container.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--muted); padding:2rem;">Belum ada rute tersedia.</div>`;
+          return;
+        }
+        container.innerHTML = json.data.map(r => `
+          <div class="route-card" onclick="window.location.href='index.html?from=${encodeURIComponent(r.origin)}&to=${encodeURIComponent(r.destination)}'">
+            <div class="route-cities">
+              <span>${r.origin}</span>
+              <span class="route-arrow">→</span>
+              <span>${r.destination}</span>
+            </div>
+            <div class="route-dist">📍 ${r.distance_km} km &nbsp;|&nbsp; 🎫 Mulai dari <strong>Rp ${Number(r.min_price || 0).toLocaleString('id-ID')}</strong></div>
+          </div>
+        `).join('');
+      } catch (e) {
+        container.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--muted); padding:2rem;">Gagal memuat rute. Pastikan server berjalan.</div>`;
+      }
+    }
+
+    // ─── LOAD MY BOOKINGS ─────────────────────────────────────────
+    async function loadMyBookings() {
+      const container = document.getElementById('bookingsContent');
+      const userStr = localStorage.getItem('gobus_user');
+      const token = localStorage.getItem('gobus_user_token');
+
+      if (!userStr || !token) {
+        container.innerHTML = `
+          <div class="login-prompt">
+            <div class="icon">🔐</div>
+            <h3>Masuk untuk Melihat Pesanan</h3>
+            <p>Anda perlu login untuk melihat riwayat pemesanan tiket Anda.</p>
+            <button class="btn btn-primary" onclick="openAuthModal('login')">Masuk Sekarang</button>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--muted);">Memuat pesanan...</div>`;
+
+      try {
+        const res = await fetch('/api/bookings/my-bookings', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const json = await res.json();
+
+        if (!json.success) throw new Error(json.message || 'Gagal memuat pesanan');
+
+        if (!json.data || json.data.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <span class="icon">🎫</span>
+              <p>Belum ada pesanan. <a href="index.html" style="color:var(--primary); font-weight:600;">Pesan tiket sekarang!</a></p>
+            </div>`;
+          return;
+        }
+
+        const statusLabel = { pending: 'Menunggu', paid: 'Lunas', failed: 'Batal', refunded: 'Direfund', refund_requested: 'Req. Refund' };
+        container.innerHTML = json.data.map(b => `
+          <div class="booking-card">
+            <div style="flex:1; min-width:0;">
+              <div class="booking-route">${b.origin} → ${b.destination}</div>
+              <div class="booking-meta">
+                🗓️ ${new Date(b.travel_date).toLocaleDateString('id-ID', {weekday:'short',day:'numeric',month:'long',year:'numeric'})}
+                &nbsp;|&nbsp; 🕐 ${b.departure_time ? b.departure_time.substring(0,5) : '-'}
+                &nbsp;|&nbsp; 🚌 ${b.bus_name || '-'}
+              </div>
+              <div class="booking-code">Kode: ${b.booking_code} &nbsp;|&nbsp; ${b.total_seats} kursi (${b.seat_numbers})</div>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.5rem;">
+              <div class="booking-price">Rp ${Number(b.total_price).toLocaleString('id-ID')}</div>
+              <span class="badge-status ${b.payment_status}">${statusLabel[b.payment_status] || b.payment_status}</span>
+              ${b.payment_status === 'paid' ? `<a href="checkout.html?code=${b.booking_code}" class="btn btn-secondary btn-sm" style="font-size:0.75rem;">Lihat E-Tiket</a>` : ''}
+              ${b.payment_status === 'pending' ? `<a href="payment.html?code=${b.booking_code}" class="btn btn-primary btn-sm" style="font-size:0.75rem;">Bayar Sekarang</a>` : ''}
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        container.innerHTML = `<div class="empty-state"><span class="icon">⚠️</span><p>${e.message}</p></div>`;
+      }
+    }
+
+    // ─── INIT ─────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAllRoutesPublic();
+
+      // Nav toggle mobile
+      const toggle = document.getElementById('navToggle');
+      const links = document.querySelector('.nav-links');
+      if (toggle && links) {
+        toggle.addEventListener('click', () => links.classList.toggle('open'));
+      }
+    });
+  </script>
+</body>
+</html>

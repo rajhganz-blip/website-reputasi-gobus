@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Kontak - GoBus</title>
+  <meta name="description" content="Hubungi tim GoBus untuk bantuan, pertanyaan, atau kerjasama.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <div class="logo">🚌 Go<span>Bus</span></div>
+    <div class="nav-links">
+      <a href="index.html">Beranda</a>
+      <a href="#popular">Rute Populer</a>
+      <a href="admin.html" class="btn-nav btn">Admin</a>
+      <a href="contact.html" class="active">Kontak</a>
+    </div>
+  </nav>
+
+  <section class="hero" style="padding:4rem 0; text-align:center; background:var(--bg);">
+    <h1>Hubungi Kami</h1>
+    <p>Tim GoBus siap membantu Anda 24/7.</p>
+  </section>
+
+  <section class="contact-section" style="max-width:800px; margin:auto; padding:2rem; background:var(--card); border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+    <h2>Informasi Kontak</h2>
+    <ul style="list-style:none; padding:0; font-size:1.1rem; line-height:2;">
+      <li>📧 Email: <a href="mailto:cs@gobus.id">cs@gobus.id</a></li>
+      <li>📞 Telepon: <a href="tel:0800-123-456">0800-123-456</a></li>
+      <li>📍 Alamat: Jl. Sudirman No. 123, Jakarta, Indonesia</li>
+    </ul>
+    <h3>Formulir Kontak</h3>
+    <form id="contactForm" style="display:flex; flex-direction:column; gap:1rem; margin-top:1rem;">
+      <input type="text" placeholder="Nama Anda" required style="padding:0.8rem; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);">
+      <input type="email" placeholder="Email" required style="padding:0.8rem; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);">
+      <textarea placeholder="Pesan Anda" rows="4" required style="padding:0.8rem; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);"></textarea>
+      <button type="submit" class="btn btn-primary" style="width:max-content; align-self:flex-start;">Kirim Pesan</button>
+    </form>
+  </section>
+
+  <footer style="text-align:center; padding:2rem; color:var(--muted);">
+    <p>© 2024 GoBus. All rights reserved.</p>
+  </footer>
+
+  <script>
+    document.getElementById('contactForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      alert('Terima kasih! Pesan Anda telah dikirim.');
+      this.reset();
+    });
+  </script>
+</body>
+</html>

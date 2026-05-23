@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cari Tiket Bus - GoBus</title>
+  <meta name="description" content="Cari jadwal bus terbaik untuk destinasi Anda di GoBus.">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <div class="logo">🚌 Go<span>Bus</span></div>
+    <div class="nav-links">
+      <a href="index.html">Pesan Tiket</a>
+      <a href="rute.html">Rute</a>
+      <a href="index.html#promo">Penawaran</a>
+      <a href="contact.html">Bantuan</a>
+    </div>
+    <div class="nav-right">
+      <a href="#" class="btn-login" onclick="openAuthModal('login', event)">Masuk</a>
+      <a href="#" class="btn btn-nav" onclick="openAuthModal('register', event)">Daftar</a>
+    </div>
+    <div class="nav-toggle" id="navToggle">☰</div>
+  </nav>
+
+  <!-- SEARCH HEADER BAR -->
+  <div class="search-header-bar">
+    <div class="container search-header-container">
+      <div class="search-route-info">
+        <h1 id="routeTitle">Menampilkan 3 bus tersedia dari Jakarta ke Surabaya</h1>
+        <p id="routeDate">Kamis, 21 Mei 2026</p>
+      </div>
+      <div class="sort-select-wrapper">
+        <span>Urutkan:</span>
+        <select class="sort-select" id="sortSelect" onchange="sortResults()">
+          <option value="earliest">Paling Awal</option>
+          <option value="latest">Paling Akhir</option>
+          <option value="cheapest">Harga Terendah</option>
+          <option value="highest">Harga Tertinggi</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN SEARCH CONTENT -->
+  <div class="container">
+    <div class="search-layout">
+      <!-- SIDEBAR FILTER -->
+      <aside class="filter-sidebar">
+        <div class="filter-header">
+          <h3>Filter</h3>
+          <button class="btn-clear" onclick="resetFilters()">Hapus Semua</button>
+        </div>
+
+        <!-- Rentang Harga -->
+        <div class="filter-group">
+          <label>Rentang Harga</label>
+          <div class="price-slider-wrapper">
+            <input type="range" min="100000" max="2500000" step="50000" value="2500000" class="price-slider" id="priceRange" oninput="updatePriceLabel(this.value)">
+            <div class="price-labels">
+              <span>Rp100.000</span>
+              <span id="priceRangeVal">Rp2.500.000</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Waktu Keberangkatan -->
+        <div class="filter-group">
+          <label>Waktu Keberangkatan</label>
+          <div class="time-filter-grid">
+            <div class="time-btn" onclick="toggleTimeFilter('morning_early', this)">
+              <!-- Early Morning -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>
+              <span class="time-label-small">Sebelum jam 6 pagi</span>
+            </div>
+            
+            <div class="time-btn" onclick="toggleTimeFilter('morning', this)">
+              <!-- Sun -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 00.495-7.467 5.99 5.99 0 00-1.925 3.546 5.974 5.974 0 01-2.133-1A3.75 3.75 0 0012 18z"/></svg>
+              <span class="time-label-small">Jam 6 pagi - 12 siang</span>
+            </div>
+
+            <div class="time-btn" onclick="toggleTimeFilter('afternoon', this)">
+              <!-- Afternoon -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>
+              <span class="time-label-small">Jam 12 siang - 6 sore</span>
+            </div>
+
+            <div class="time-btn" onclick="toggleTimeFilter('night', this)">
+              <!-- Moon -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg>
+              <span class="time-label-small">Setelah jam 6 sore</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fasilitas -->
+        <div class="filter-group">
+          <label>Fasilitas</label>
+          <div class="checkbox-list">
+            <label class="checkbox-item"><input type="checkbox" id="facWifi" onchange="filterResults()"> WiFi Gratis</label>
+            <label class="checkbox-item"><input type="checkbox" id="facAc" onchange="filterResults()"> AC</label>
+            <label class="checkbox-item"><input type="checkbox" id="facPower" onchange="filterResults()" checked> Port Charger</label>
+            <label class="checkbox-item"><input type="checkbox" id="facToilet" onchange="filterResults()"> Toilet di Bus</label>
+          </div>
+        </div>
+
+        <!-- Operator Bus -->
+        <div class="filter-group">
+          <label>Operator Bus</label>
+          <div class="checkbox-list">
+            <label class="checkbox-item"><input type="checkbox" id="opSwift" onchange="filterResults()" checked> Swift Lines</label>
+            <label class="checkbox-item"><input type="checkbox" id="opRoyal" onchange="filterResults()"> Royal Cruiser</label>
+            <label class="checkbox-item"><input type="checkbox" id="opEco" onchange="filterResults()"> Eco Transit</label>
+          </div>
+        </div>
+      </aside>
+
+      <!-- RESULTS PANEL -->
+      <main>
+        <div class="bus-results-list" id="busResultsContainer">
+          <!-- Will be rendered via JS -->
+          <div class="loader"><div class="spinner"></div><span>Mencari jadwal bus...</span></div>
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="pagination">
+          <div class="pagination-item disabled">◀</div>
+          <div class="pagination-item active">1</div>
+          <div class="pagination-item">2</div>
+          <div class="pagination-item">3</div>
+          <div class="pagination-item">▶</div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <div class="logo">GoBus</div>
+        <p>Platform Pemesanan Tiket Terpercaya. Nikmati perjalanan dengan kenyamanan maksimal.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Tentang Kami</h4>
+        <ul>
+          <li><a href="#">Tentang Kami</a></li>
+          <li><a href="#">Hubungi Kami</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Dukungan</h4>
+        <ul>
+          <li><a href="#">Kebijakan Privasi</a></li>
+          <li><a href="#">Syarat & Ketentuan</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Eksplorasi</h4>
+        <ul>
+          <li><a href="#">Jadwal Populer</a></li>
+          <li><a href="#">Promo Terbaru</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    // Demo Bus Data matching the screenshot perfectly
+    const demoBuses = [
+      {
+        id: 101,
+        bus_name: "Swift Lines Premium",
+        bus_class: "EXPRESS",
+        bus_class_badge: "express",
+        facilities_badge: "ac",
+        facilities: "WiFi Gratis, Soket Listrik, Ruang Kaki Luas",
+        rating: "4.2",
+        reviews: "128",
+        departure_time: "08:30 AM",
+        departure_time_24: 8.5,
+        arrival_time: "12:45 PM",
+        departure_station: "Terminal Pulo Gebang, Jakarta",
+        arrival_station: "Terminal Bungurasih, Surabaya",
+        duration: "4j 15m",
+        image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=400&q=80",
+        price: 450000,
+        price_formatted: "Rp450.000",
+        seats_left: "12 Kursi tersisa",
+        seats_status: "success",
+        facilities_list: ["WiFi Gratis", "AC", "Port Charger", "Legroom"]
+      },
+      {
+        id: 102,
+        bus_name: "Royal Cruiser Elite",
+        bus_class: "MEWAH",
+        bus_class_badge: "mewah",
+        facilities_badge: "makanan",
+        facilities: "WiFi Sangat Cepat, Camilan, Toilet di Bus",
+        rating: "4.9",
+        reviews: "85",
+        departure_time: "10:15 AM",
+        departure_time_24: 10.25,
+        arrival_time: "02:15 PM",
+        departure_station: "Terminal Kalideres, Jakarta",
+        arrival_station: "Terminal Bungurasih, Surabaya",
+        duration: "4j 00m",
+        image: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?auto=format&fit=crop&w=400&q=80",
+        price: 685000,
+        price_formatted: "Rp685.000",
+        seats_left: "Sisa 4 Kursi!",
+        seats_status: "warning",
+        facilities_list: ["WiFi Gratis", "AC", "Port Charger", "Toilet di Bus", "Makan"]
+      },
+      {
+        id: 103,
+        bus_name: "Eco Transit Saver",
+        bus_class: "HEMAT",
+        bus_class_badge: "express",
+        facilities_badge: "eco",
+        facilities: "Port USB, Bagasi Standar",
+        rating: "3.5",
+        reviews: "210",
+        departure_time: "11:00 AM",
+        departure_time_24: 11.0,
+        arrival_time: "03:45 PM",
+        departure_station: "Terminal Kampung Rambutan, Jakarta",
+        arrival_station: "Terminal Bungurasih, Surabaya",
+        duration: "4j 45m",
+        image: "https://images.unsplash.com/photo-1562601579-579bc89ff715?auto=format&fit=crop&w=400&q=80",
+        price: 320000,
+        price_formatted: "Rp320.000",
+        seats_left: "Tersedia",
+        seats_status: "success",
+        facilities_list: ["AC", "Port Charger", "Bagasi"]
+      }
+    ];
+
+    let activeTimeFilter = null;
+    let originVal = "Jakarta";
+    let destVal = "Surabaya";
+    let dateVal = "2026-05-21";
+    let allFetchedBuses = [];
+    let currentResults = [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // Parse URL parameters
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("origin")) originVal = params.get("origin");
+      if (params.get("destination")) destVal = params.get("destination");
+      if (params.get("date")) dateVal = params.get("date");
+
+      // Format Date nicely
+      const d = new Date(dateVal);
+      const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+      const formattedDate = d.toLocaleDateString('id-ID', options);
+
+      document.getElementById("routeDate").textContent = formattedDate;
+
+      loadSearchResults();
+    });
+
+    async function loadSearchResults() {
+      const container = document.getElementById("busResultsContainer");
+      container.innerHTML = `
+        <div style="text-align:center; padding:4rem 0; color:var(--text-muted);">
+          <div style="border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
+          <h3>Mencari Jadwal Bus...</h3>
+          <p style="font-size:0.9rem; margin-top:0.25rem;">Mohon tunggu sebentar, kami sedang menghubungkan dengan server.</p>
+        </div>`;
+
+      try {
+        const response = await fetch(`/api/search?origin=${encodeURIComponent(originVal)}&destination=${encodeURIComponent(destVal)}&date=${dateVal}`);
+        const res = await response.json();
+        
+        if (res.success && res.data && res.data.length > 0) {
+          // Map backend format to frontend format
+          allFetchedBuses = res.data.map(item => {
+            const facilities_list = item.facilities ? item.facilities.split(',').map(f => f.trim()) : ["AC"];
+            
+            // Format departure/arrival times
+            const depParts = item.departure_time.split(':');
+            const depHours = parseInt(depParts[0]);
+            const depMins = depParts[1];
+            const depAmPm = depHours >= 12 ? 'PM' : 'AM';
+            const depHours12 = depHours % 12 || 12;
+            const departure_time_formatted = `${depHours12}:${depMins} ${depAmPm}`;
+            const departure_time_24 = depHours + parseInt(depMins)/60;
+
+            const arrParts = item.arrival_time.split(':');
+            const arrHours = parseInt(arrParts[0]);
+            const arrMins = arrParts[1];
+            const arrAmPm = arrHours >= 12 ? 'PM' : 'AM';
+            const arrHours12 = arrHours % 12 || 12;
+            const arrival_time_formatted = `${arrHours12}:${arrMins} ${arrAmPm}`;
+
+            // Compute duration (rough approximation)
+            let diffMins = (arrHours * 60 + parseInt(arrMins)) - (depHours * 60 + parseInt(depMins));
+            if (diffMins < 0) diffMins += 24 * 60; // overnight
+            const durHours = Math.floor(diffMins / 60);
+            const durMins = diffMins % 60;
+            const duration = `${durHours}j ${durMins}m`;
+
+            // Badge classification
+            let badge = 'express';
+            if (item.bus_class.toLowerCase().includes('exec')) badge = 'mewah';
+
+            return {
+              id: item.id,
+              bus_name: item.bus_name,
+              bus_class: item.bus_class.toUpperCase(),
+              bus_class_badge: badge,
+              facilities_badge: facilities_list[0] || 'AC',
+              facilities: item.facilities || '',
+              rating: (4.0 + (item.id % 10) / 10).toFixed(1), // Mock rating based on id
+              reviews: (50 + (item.id % 5) * 42).toString(),
+              departure_time: departure_time_formatted,
+              departure_time_24: departure_time_24,
+              arrival_time: arrival_time_formatted,
+              departure_station: `Terminal ${item.origin}`,
+              arrival_station: `Terminal ${item.destination}`,
+              duration: duration,
+              image: item.image_url || 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=400&q=80',
+              price: Number(item.base_price),
+              seats_left: `${item.available_seats} Kursi tersisa`,
+              seats_status: item.available_seats <= 5 ? 'warning' : 'success',
+              facilities_list: facilities_list
+            };
+          });
+        } else {
+          // If no results, mapping demo buses matching the search route (simulated backend fallback)
+          allFetchedBuses = demoBuses.map(bus => ({
+            ...bus,
+            departure_station: `Terminal ${originVal}`,
+            arrival_station: `Terminal ${destVal}`
+          }));
+        }
+      } catch (err) {
+        console.error("Search API Error, falling back to mock data:", err);
+        allFetchedBuses = demoBuses.map(bus => ({
+          ...bus,
+          departure_station: `Terminal ${originVal}`,
+          arrival_station: `Terminal ${destVal}`
+        }));
+      }
+
+      currentResults = [...allFetchedBuses];
+      document.getElementById("routeTitle").textContent = `Menampilkan ${currentResults.length} bus tersedia dari ${originVal} ke ${destVal}`;
+      renderResults(currentResults);
+    }
+
+    function toast(msg, type = 'success') {
+      const c = document.getElementById('toastContainer');
+      if (!c) return;
+      const t = document.createElement('div');
+      t.className = `toast ${type}`;
+      const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+      t.innerHTML = `<span>${icons[type] || 'ℹ️'} ${msg}</span>`;
+      c.appendChild(t);
+      setTimeout(() => {
+        t.style.animation = 'slideOut .3s ease forwards';
+        setTimeout(() => t.remove(), 300);
+      }, 3500);
+    }
+
+    function renderResults(buses) {
+      const container = document.getElementById("busResultsContainer");
+      if (buses.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:4rem 0; color:var(--text-muted);">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:64px;height:64px;margin-bottom:1rem;color:#cbd5e1;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.182 16.318A4.486 4.486 0 0012.016 15a4.486 4.486 0 00-3.198 1.318M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z"/></svg>
+            <h3>Tidak Ada Jadwal Ditemukan</h3>
+            <p style="font-size:0.9rem;margin-top:0.25rem;">Cobalah ganti filter Anda atau cari rute yang lain.</p>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = buses.map(bus => `
+        <div class="bus-card">
+          <div class="bus-card-image">
+            <img src="${bus.image}" alt="${bus.bus_name}">
+          </div>
+          <div class="bus-card-content">
+            <div>
+              <div class="bus-card-header">
+                <span class="bus-card-title">${bus.bus_name}</span>
+                <span class="bus-class-badge ${bus.bus_class_badge}">${bus.bus_class}</span>
+                <span class="bus-class-badge" style="background-color:#eff6ff;color:#1d4ed8;">${bus.facilities_badge.toUpperCase()}</span>
+              </div>
+              <div class="rating-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
+                <span class="rating-num">${bus.rating}</span>
+                <span class="rating-count">• ${bus.reviews} Ulasan</span>
+              </div>
+              
+              <!-- Timeline -->
+              <div class="bus-timeline">
+                <div class="timeline-point">
+                  <span class="timeline-time">${bus.departure_time}</span>
+                  <span class="timeline-station">${bus.departure_station.split(',')[0]}</span>
+                </div>
+                <div class="timeline-bar">
+                  <span class="timeline-duration">${bus.duration}</span>
+                  <div class="timeline-line-wrapper">
+                    <div class="timeline-bus-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.129-1.125V11.25M3 11.25c0-2.12 1.449-3.905 3.42-4.484m12.16 4.484a6.721 6.721 0 00-3.42-4.484m3.42 4.484v5.25c0 .621-.504 1.125-1.125 1.125m-11.25-11.25H18M3 11.25v5.25c0 .621.504 1.125 1.125 1.125m1.38-11.25a6.721 6.721 0 013.42-4.484m0 0A6.721 6.721 0 0112 3c1.28 0 2.476.357 3.51 1.016m-7.02 0A6.722 6.722 0 0012 5.25a6.723 6.723 0 003.51-1.016m-7.02 0h7.02L18 11.25M6.42 6.766L3 11.25m12.16-4.484L18 11.25"/></svg>
+                    </div>
+                  </div>
+                </div>
+                <div class="timeline-point">
+                  <span class="timeline-time">${bus.arrival_time}</span>
+                  <span class="timeline-station">${bus.arrival_station.split(',')[0]}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Facilities -->
+            <div class="bus-card-facilities">
+              ${bus.facilities_list.map(f => {
+                let icon = '';
+                if (f.toLowerCase().includes("wifi")) icon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.284 16.284A3 3 0 0012 17a3 3 0 003.716-1.284M5.456 13.456a6 6 0 018.544 0m-11.392-2.848a9 9 0 0114.28 0M1.188 7.792a12 12 0 0116.8 0M12 20h.008v.008H12V20z"/></svg>`;
+                else if (f.toLowerCase().includes("ac") || f.toLowerCase().includes("toilet")) icon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
+                else if (f.toLowerCase().includes("charger")) icon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>`;
+                else icon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.746 3.746 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z"/></svg>`;
+                return `<span class="bus-facility-tag">${icon} ${f}</span>`;
+              }).join('')}
+            </div>
+          </div>
+          
+          <div class="bus-card-action-area">
+            <span class="bus-price-label">Per Kursi</span>
+            <span class="bus-price-amount">Rp${(bus.price).toLocaleString('id-ID')}</span>
+            <span class="bus-seats-left ${bus.seats_status}">${bus.seats_left}</span>
+            <button class="btn btn-primary btn-select-seat" onclick="selectBus(${bus.id})">Pilih Kursi</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updatePriceLabel(val) {
+      document.getElementById("priceRangeVal").textContent = "Rp" + Number(val).toLocaleString('id-ID');
+      filterResults();
+    }
+
+    function toggleTimeFilter(timeType, el) {
+      if (activeTimeFilter === timeType) {
+        activeTimeFilter = null;
+        el.classList.remove("active");
+      } else {
+        document.querySelectorAll(".time-btn").forEach(btn => btn.classList.remove("active"));
+        activeTimeFilter = timeType;
+        el.classList.add("active");
+      }
+      filterResults();
+    }
+
+    function filterResults() {
+      const priceMax = Number(document.getElementById("priceRange").value);
+      const wifiChecked = document.getElementById("facWifi").checked;
+      const acChecked = document.getElementById("facAc").checked;
+      const chargerChecked = document.getElementById("facPower").checked;
+      const toiletChecked = document.getElementById("facToilet").checked;
+
+      const opSwift = document.getElementById("opSwift").checked;
+      const opRoyal = document.getElementById("opRoyal").checked;
+      const opEco = document.getElementById("opEco").checked;
+
+      let filtered = allFetchedBuses.filter(bus => {
+        // Price Max
+        if (bus.price > priceMax) return false;
+
+        // Operator
+        const isSwift = bus.bus_name.includes("Swift");
+        const isRoyal = bus.bus_name.includes("Royal");
+        const isEco = bus.bus_name.includes("Eco");
+        
+        if (isSwift && !opSwift) return false;
+        if (isRoyal && !opRoyal) return false;
+        if (isEco && !opEco) return false;
+
+        // Facilities
+        if (wifiChecked && !bus.facilities_list.some(f => f.toLowerCase().includes("wifi"))) return false;
+        if (acChecked && !bus.facilities_list.some(f => f.toLowerCase().includes("ac"))) return false;
+        if (chargerChecked && !bus.facilities_list.some(f => f.toLowerCase().includes("charger"))) return false;
+        if (toiletChecked && !bus.facilities_list.some(f => f.toLowerCase().includes("toilet"))) return false;
+
+        // Time filter
+        if (activeTimeFilter) {
+          const t = bus.departure_time_24;
+          if (activeTimeFilter === 'morning_early' && t >= 6.0) return false;
+          if (activeTimeFilter === 'morning' && (t < 6.0 || t >= 12.0)) return false;
+          if (activeTimeFilter === 'afternoon' && (t < 12.0 || t >= 18.0)) return false;
+          if (activeTimeFilter === 'night' && t < 18.0) return false;
+        }
+
+        return true;
+      });
+
+      currentResults = [...filtered];
+      document.getElementById("routeTitle").textContent = `Menampilkan ${currentResults.length} bus tersedia dari ${originVal} ke ${destVal}`;
+      renderResults(currentResults);
+    }
+
+    function resetFilters() {
+      document.getElementById("priceRange").value = 2500000;
+      document.getElementById("priceRangeVal").textContent = "Rp2.500.000";
+      
+      document.getElementById("facWifi").checked = false;
+      document.getElementById("facAc").checked = false;
+      document.getElementById("facPower").checked = false;
+      document.getElementById("facToilet").checked = false;
+
+      document.getElementById("opSwift").checked = true;
+      document.getElementById("opRoyal").checked = true;
+      document.getElementById("opEco").checked = true;
+
+      activeTimeFilter = null;
+      document.querySelectorAll(".time-btn").forEach(btn => btn.classList.remove("active"));
+
+      filterResults();
+      toast("Semua filter telah dihapus", "info");
+    }
+
+    function sortResults() {
+      const val = document.getElementById("sortSelect").value;
+      let sorted = [...currentResults];
+      if (val === "cheapest") {
+        sorted.sort((a, b) => a.price - b.price);
+      } else if (val === "highest") {
+        sorted.sort((a, b) => b.price - a.price);
+      } else if (val === "earliest") {
+        sorted.sort((a, b) => a.departure_time_24 - b.departure_time_24);
+      } else if (val === "latest") {
+        sorted.sort((a, b) => b.departure_time_24 - a.departure_time_24);
+      }
+      renderResults(sorted);
+    }
+
+    function selectBus(busId) {
+      const bus = allFetchedBuses.find(b => b.id === busId);
+      if (!bus) return;
+      
+      // Save details to localStorage
+      localStorage.setItem("selectedBus", JSON.stringify(bus));
+      localStorage.setItem("origin", originVal);
+      localStorage.setItem("destination", destVal);
+      localStorage.setItem("date", dateVal);
+
+      // Redirect to seat selection page
+      window.location.href = "seat.html";
+    }
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>

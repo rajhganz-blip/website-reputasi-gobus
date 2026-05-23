@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pembayaran Berhasil - GoBus</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .success-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 3rem 2rem;
+      box-shadow: var(--shadow-lg);
+      max-width: 550px;
+      margin: 3rem auto;
+      text-align: center;
+    }
+    .success-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background-color: rgba(34, 197, 94, 0.1);
+      color: var(--success);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      font-size: 2.5rem;
+    }
+    .ticket-container {
+      background-color: #f8fafc;
+      border: 1.5px dashed var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      text-align: left;
+      margin: 2rem 0;
+      position: relative;
+    }
+    .ticket-container::before, .ticket-container::after {
+      content: '';
+      width: 20px;
+      height: 20px;
+      background-color: var(--bg);
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .ticket-container::before { left: -11px; border-right: 1.5px dashed var(--border); }
+    .ticket-container::after { right: -11px; border-left: 1.5px dashed var(--border); }
+    
+    .ticket-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .ticket-col {
+      display: flex;
+      flex-direction: column;
+    }
+    .ticket-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .ticket-value {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <div class="logo">🚌 Go<span>Bus</span></div>
+    <div class="nav-links">
+      <a href="index.html">Pesan Tiket</a>
+      <a href="rute.html">Rute</a>
+      <a href="index.html#promo">Penawaran</a>
+      <a href="contact.html">Bantuan</a>
+    </div>
+    <div class="nav-right">
+      <a href="#" class="btn-login" onclick="openAuthModal('login', event)">Masuk</a>
+      <a href="#" class="btn btn-nav" onclick="openAuthModal('register', event)">Daftar</a>
+    </div>
+    <div class="nav-toggle" id="navToggle">☰</div>
+  </nav>
+
+  <!-- CONTENT -->
+  <div class="container">
+    <div class="success-card">
+      <div class="success-icon">✓</div>
+      <h2 style="font-weight:800; font-size:1.75rem;">Pembayaran Berhasil!</h2>
+      <p style="color:var(--text-muted); font-size:0.95rem; margin-top:0.25rem;">E-Tiket Anda telah aktif dan siap digunakan untuk perjalanan.</p>
+      
+      <!-- Ticket Box -->
+      <div class="ticket-container">
+        <div class="ticket-row" style="border-bottom:1px dashed var(--border); padding-bottom:1rem; margin-bottom:1rem;">
+          <div class="ticket-col">
+            <span class="ticket-label">Kode Booking</span>
+            <span class="ticket-value" id="tCode" style="color:var(--primary); font-family:monospace; font-size:1.1rem;">GB12345678</span>
+          </div>
+          <div class="ticket-col" style="text-align:right;">
+            <span class="ticket-label">Status</span>
+            <span class="ticket-value" style="color:var(--success);">ETICKET AKTIF</span>
+          </div>
+        </div>
+
+        <div class="ticket-row">
+          <div class="ticket-col">
+            <span class="ticket-label">Rute Perjalanan</span>
+            <span class="ticket-value" id="tRoute">Jakarta → Surabaya</span>
+          </div>
+          <div class="ticket-col" style="text-align:right;">
+            <span class="ticket-label">Bus</span>
+            <span class="ticket-value" id="tBus">Swift Lines Premium</span>
+          </div>
+        </div>
+
+        <div class="ticket-row">
+          <div class="ticket-col">
+            <span class="ticket-label">Tanggal</span>
+            <span class="ticket-value" id="tDate">Kamis, 21 Mei 2026</span>
+          </div>
+          <div class="ticket-col" style="text-align:right;">
+            <span class="ticket-label">Nomor Kursi</span>
+            <span class="ticket-value" id="tSeats">3A</span>
+          </div>
+        </div>
+
+        <div class="ticket-row" style="margin-bottom:0;">
+          <div class="ticket-col">
+            <span class="ticket-label">Penumpang</span>
+            <span class="ticket-value" id="tPassenger">Budi Santoso</span>
+          </div>
+          <div class="ticket-col" style="text-align:right;">
+            <span class="ticket-label">Scan Barcode</span>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=TicketVerified" style="width:45px; height:45px; margin-top:0.25rem;" alt="QR Code">
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:1rem; justify-content:center; margin-top:2rem;">
+        <a href="index.html" class="btn btn-secondary">Kembali ke Beranda</a>
+        <button class="btn btn-primary" onclick="window.print()">Cetak E-Tiket</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer style="margin-top:5rem;">
+    <div class="container footer-bottom" style="border:none; padding:0;">
+      <span style="margin: 0 auto;">© 2024 GoBus. Perjalanan Aman dan Menyenangkan.</span>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      // Load details from localStorage
+      const code = localStorage.getItem("bookingCode");
+      
+      if (code) {
+        document.getElementById("tCode").textContent = code;
+        try {
+          const response = await fetch(`/api/ticket/${code}`);
+          const res = await response.json();
+          if (res.success && res.data) {
+            const t = res.data;
+            document.getElementById("tSeats").textContent = t.seat_numbers;
+            document.getElementById("tBus").textContent = t.bus_name;
+            document.getElementById("tRoute").textContent = `${t.origin} → ${t.destination}`;
+            
+            const d = new Date(t.travel_date);
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            document.getElementById("tDate").textContent = d.toLocaleDateString('id-ID', options);
+            document.getElementById("tPassenger").textContent = t.passenger_name;
+            
+            const qrImg = document.querySelector(".ticket-row img");
+            if (qrImg) {
+              qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${t.booking_code}`;
+            }
+            return;
+          }
+        } catch (err) {
+          console.error("Error loading ticket from database:", err);
+        }
+      }
+
+      // Fallback
+      const seats = localStorage.getItem("selectedSeats");
+      const busData = localStorage.getItem("selectedBus");
+      const origin = localStorage.getItem("origin") || "Jakarta";
+      const destination = localStorage.getItem("destination") || "Surabaya";
+      const date = localStorage.getItem("date") || "2026-05-21";
+
+      if (code) document.getElementById("tCode").textContent = code;
+      
+      if (seats) {
+        document.getElementById("tSeats").textContent = JSON.parse(seats).join(", ");
+      }
+      
+      if (busData) {
+        document.getElementById("tBus").textContent = JSON.parse(busData).bus_name;
+      }
+      
+      document.getElementById("tRoute").textContent = `${origin} → ${destination}`;
+      
+      const d = new Date(date);
+      const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+      document.getElementById("tDate").textContent = d.toLocaleDateString('id-ID', options);
+
+      const userStr = localStorage.getItem('gobus_user');
+      if (userStr) {
+        document.getElementById("tPassenger").textContent = JSON.parse(userStr).name;
+      } else {
+        document.getElementById("tPassenger").textContent = "Budi Santoso";
+      }
+    });
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>

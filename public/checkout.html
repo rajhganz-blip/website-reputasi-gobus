@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Penumpang - GoBus</title>
+  <meta name="description" content="Masukkan data penumpang untuk menyelesaikan reservasi tiket bus GoBus Anda.">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav>
+    <div class="logo">🚌 Go<span>Bus</span></div>
+    <div class="nav-links">
+      <a href="index.html">Pesan Tiket</a>
+      <a href="rute.html">Rute</a>
+      <a href="index.html#promo">Penawaran</a>
+      <a href="contact.html">Bantuan</a>
+    </div>
+    <div class="nav-right">
+      <a href="#" class="btn-login" onclick="openAuthModal('login', event)">Masuk</a>
+      <a href="#" class="btn btn-nav" onclick="openAuthModal('register', event)">Daftar</a>
+    </div>
+    <div class="nav-toggle" id="navToggle">☰</div>
+  </nav>
+
+  <!-- STEPPER AND CONTENT -->
+  <div class="container" style="margin-top: 2.5rem; margin-bottom: 4rem;">
+    <!-- Stepper -->
+    <div class="stepper-container">
+      <div class="stepper">
+        <div class="step-node done">
+          <div class="step-circle">1</div>
+          <span class="step-label" style="margin-left: 0.5rem;">Detail Perjalanan</span>
+        </div>
+        <div class="step-line done"></div>
+        <div class="step-node active">
+          <div class="step-circle">2</div>
+          <span class="step-label" style="margin-left: 0.5rem;">Data Penumpang</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-node">
+          <div class="step-circle">3</div>
+          <span class="step-label" style="margin-left: 0.5rem;">Pembayaran</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Booking details columns -->
+    <div class="seat-selection-layout">
+      <!-- LEFT COLUMN: FORMS -->
+      <main>
+        <!-- Kontak Pemesan Card -->
+        <div class="checkout-card">
+          <h3>Kontak Pemesan</h3>
+          <div class="checkout-grid">
+            <!-- Nama Lengkap -->
+            <div class="form-group full-width">
+              <label>Nama Lengkap (sesuai KTP)</label>
+              <div class="form-group-icon-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:18px;height:18px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+                <input type="text" id="contactName" value="Budi Santoso" oninput="syncPassengerData()">
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+              <label>Email</label>
+              <div class="form-group-icon-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:18px;height:18px;"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+                <input type="email" id="contactEmail" value="budi@email.com">
+              </div>
+            </div>
+
+            <!-- Nomor Telepon -->
+            <div class="form-group">
+              <label>Nomor Telepon</label>
+              <div class="form-group-icon-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:18px;height:18px;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-2.824-1.802-5.188-4.166-7-7l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.11-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg>
+                <input type="text" id="contactPhone" value="+62 812 3456 789">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detail Penumpang Card -->
+        <div class="checkout-card">
+          <h3>Detail Penumpang</h3>
+          
+          <label class="passenger-checkbox-wrapper">
+            <input type="checkbox" id="syncCheckbox" checked onchange="toggleSync()">
+            Sama dengan kontak pemesan
+          </label>
+
+          <!-- Passenger Card -->
+          <div style="border: 1px solid var(--border); padding: 1.5rem; border-radius: var(--radius-md);">
+            <div class="passenger-box-header">
+              <!-- Passenger Icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <span>Penumpang 1 (Dewasa)</span>
+            </div>
+
+            <div class="checkout-grid">
+              <!-- Nama Lengkap -->
+              <div class="form-group full-width">
+                <label>Nama Lengkap</label>
+                <input type="text" id="passengerName" value="Budi Santoso" readonly>
+              </div>
+
+              <!-- ID / Passport -->
+              <div class="form-group">
+                <label>ID (KTP/Passport)</label>
+                <input type="text" id="passengerIdNumber" value="3201234567890001">
+              </div>
+
+              <!-- Kursi Terpilih -->
+              <div class="form-group">
+                <label>Kursi Terpilih</label>
+                <div class="seat-badge">
+                  <!-- Seat Icon -->
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.129-1.125V11.25M3 11.25c0-2.12 1.449-3.905 3.42-4.484M18 11.25V16.5m-15-5.25v5.25"/></svg>
+                  <span id="passengerSeatLabel">Kursi 4A</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </main>
+
+      <!-- RIGHT COLUMN: SUMMARY -->
+      <aside class="details-panel">
+        
+        <!-- Summary Route Timeline Card with Blue Header -->
+        <div class="trip-details-card" style="border: none;">
+          <!-- Blue Header -->
+          <div class="summary-header-blue">
+            <h3 style="margin-bottom:1rem;">Ringkasan Pesanan</h3>
+            
+            <div class="route-timeline-blue">
+              <div class="timeline-step origin">
+                <div class="step-time" id="sumOriginTime">08:00 WIB</div>
+                <div class="step-city" id="sumOriginCity">Jakarta</div>
+                <div class="step-station" id="sumOriginStation">Terminal Pulo Gebang</div>
+              </div>
+              <div class="timeline-step destination">
+                <div class="step-time" id="sumDestTime">19:30 WIB</div>
+                <div class="step-city" id="sumDestCity">Surabaya</div>
+                <div class="step-station" id="sumDestStation">Terminal Bungurasih</div>
+              </div>
+            </div>
+
+            <!-- Bus Info Preview -->
+            <div class="summary-bus-preview">
+              <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                <span style="font-size:0.75rem; color:rgba(255,255,255,0.7);">Operator Bus</span>
+                <span id="sumBusName" style="font-weight:700;">Pahala Kencana</span>
+              </div>
+              <div>
+                <span class="badge" id="sumBusClass">EXECUTIVE AC</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Summary Body -->
+          <div class="trip-details-body">
+            
+            <!-- Mini Layout Preview -->
+            <div class="layout-preview-title">Pilih Kursi (Layout 2-2)</div>
+            <div class="layout-preview-box">
+              <div class="mini-bus-grid">
+                <!-- Renders small 4 columns -->
+                <div class="mini-seat" id="mini-seat-1A">1A</div>
+                <div class="mini-seat" id="mini-seat-1B">1B</div>
+                <div class="mini-seat aisle"></div>
+                <div class="mini-seat" id="mini-seat-1C">1C</div>
+                
+                <div class="mini-seat" id="mini-seat-2A">2A</div>
+                <div class="mini-seat" id="mini-seat-2B">2B</div>
+                <div class="mini-seat aisle"></div>
+                <div class="mini-seat" id="mini-seat-2C">2C</div>
+
+                <div class="mini-seat" id="mini-seat-3A">3A</div>
+                <div class="mini-seat" id="mini-seat-3B">3B</div>
+                <div class="mini-seat aisle"></div>
+                <div class="mini-seat" id="mini-seat-3C">3C</div>
+
+                <div class="mini-seat" id="mini-seat-4A">4A</div>
+                <div class="mini-seat" id="mini-seat-4B">4B</div>
+                <div class="mini-seat aisle"></div>
+                <div class="mini-seat" id="mini-seat-4C">4C</div>
+              </div>
+            </div>
+
+            <!-- Breakdown Summary Table -->
+            <table class="price-summary-table">
+              <tr>
+                <td class="label" id="summaryDewasaLabel">Tiket Dewasa (x1)</td>
+                <td class="value" id="summaryTicketPrice">Rp385.000</td>
+              </tr>
+              <tr>
+                <td class="label">Biaya Layanan</td>
+                <td class="value" id="summaryServiceFee">Rp5.000</td>
+              </tr>
+              <tr class="total-row">
+                <td class="total-label">Total Pembayaran</td>
+                <td class="total-value" id="summaryTotalPayment">Rp390.000</td>
+              </tr>
+            </table>
+
+            <!-- Submit payment link button -->
+            <button class="btn btn-primary btn-checkout" onclick="submitBooking()">Lanjutkan ke Pembayaran</button>
+
+            <!-- Bottom secure info -->
+            <div class="security-info">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M12 3v13.5M12 21c-4.83 0-8.75-3.92-8.75-8.75S7.17 3.5 12 3.5s8.75 3.92 8.75 8.75-3.92 8.75-8.75 8.75z"/></svg>
+              <span>Pembayaran aman & terenkripsi</span>
+            </div>
+
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <div class="logo">GoBus</div>
+        <p>© 2024 GoBus Indonesia. Reliable and Modern Bus Travel.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Partner with Us</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#">Help Center</a></li>
+          <li><a href="#">Contact Us</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    let selectedSeats = ["4A"];
+    let ticketPrice = 385000;
+    let serviceFee = 5000;
+    let totalPayment = 390000;
+    let scheduleId = 1; // Default fallback schedule
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // Load details from localStorage
+      const busData = localStorage.getItem("selectedBus");
+      const seatsData = localStorage.getItem("selectedSeats");
+      const origin = localStorage.getItem("origin") || "Jakarta";
+      const destination = localStorage.getItem("destination") || "Surabaya";
+      const date = localStorage.getItem("date") || "2026-05-21";
+
+      if (seatsData) {
+        selectedSeats = JSON.parse(seatsData);
+      }
+
+      // Update Passenger Details Seat Label
+      document.getElementById("passengerSeatLabel").textContent = `Kursi ${selectedSeats.join(", ")}`;
+
+      if (busData) {
+        const bus = JSON.parse(busData);
+        scheduleId = bus.id;
+        
+        // Dynamically compute prices based on selected seat count
+        const count = selectedSeats.length;
+        ticketPrice = bus.price * count;
+        serviceFee = 5000 * count; // Smaller service fee as per the fourth screenshot (Rp5.000)
+        totalPayment = ticketPrice + serviceFee;
+
+        document.getElementById("sumBusName").textContent = bus.bus_name;
+        document.getElementById("sumBusClass").textContent = `${bus.bus_class.toUpperCase()} AC`;
+        
+        // Timeline times and stations
+        document.getElementById("sumOriginTime").textContent = bus.departure_time + " WIB";
+        document.getElementById("sumDestTime").textContent = bus.arrival_time + " WIB";
+        
+        document.getElementById("sumOriginCity").textContent = origin;
+        document.getElementById("sumDestCity").textContent = destination;
+        document.getElementById("sumOriginStation").textContent = bus.departure_station;
+        document.getElementById("sumDestStation").textContent = bus.arrival_station;
+      }
+
+      // Populate pricing breakdown table
+      document.getElementById("summaryDewasaLabel").textContent = `Tiket Dewasa (x${selectedSeats.length})`;
+      document.getElementById("summaryTicketPrice").textContent = "Rp" + ticketPrice.toLocaleString('id-ID');
+      document.getElementById("summaryServiceFee").textContent = "Rp" + serviceFee.toLocaleString('id-ID');
+      document.getElementById("summaryTotalPayment").textContent = "Rp" + totalPayment.toLocaleString('id-ID');
+
+      // Pre-populate contact fields if user is logged in
+      const userStr = localStorage.getItem('gobus_user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        if (user.name) document.getElementById("contactName").value = user.name;
+        if (user.email) document.getElementById("contactEmail").value = user.email;
+        if (user.phone) document.getElementById("contactPhone").value = user.phone;
+      }
+
+      // Update mini bus grid highlighted seats
+      selectedSeats.forEach(seat => {
+        const seatId = `mini-seat-${seat}`;
+        const el = document.getElementById(seatId);
+        if (el) {
+          el.classList.add("selected");
+        } else {
+          // If the seat is e.g. 3A and doesn't exist in our hardcoded mini-grid, we can create it dynamically
+          const grid = document.querySelector(".mini-bus-grid");
+          if (grid) {
+            const newSeat = document.createElement("div");
+            newSeat.className = "mini-seat selected";
+            newSeat.id = seatId;
+            newSeat.textContent = seat;
+            grid.appendChild(newSeat);
+          }
+        }
+      });
+    });
+
+    function toast(msg, type = 'success') {
+      const c = document.getElementById('toastContainer');
+      if (!c) return;
+      const t = document.createElement('div');
+      t.className = `toast ${type}`;
+      const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+      t.innerHTML = `<span>${icons[type] || 'ℹ️'} ${msg}</span>`;
+      c.appendChild(t);
+      setTimeout(() => {
+        t.style.animation = 'slideOut .3s ease forwards';
+        setTimeout(() => t.remove(), 300);
+      }, 3500);
+    }
+
+    function toggleSync() {
+      const isChecked = document.getElementById("syncCheckbox").checked;
+      const pName = document.getElementById("passengerName");
+      
+      if (isChecked) {
+        pName.value = document.getElementById("contactName").value;
+        pName.readOnly = true;
+      } else {
+        pName.readOnly = false;
+        pName.value = "";
+      }
+    }
+
+    function syncPassengerData() {
+      const isChecked = document.getElementById("syncCheckbox").checked;
+      if (isChecked) {
+        document.getElementById("passengerName").value = document.getElementById("contactName").value;
+      }
+    }
+
+    async function submitBooking() {
+      const cName = document.getElementById("contactName").value.trim();
+      const cEmail = document.getElementById("contactEmail").value.trim();
+      const cPhone = document.getElementById("contactPhone").value.trim();
+      
+      const pName = document.getElementById("passengerName").value.trim();
+      const pId = document.getElementById("passengerIdNumber").value.trim();
+
+      if (!cName || !cEmail || !cPhone || !pName || !pId) {
+        toast("Silakan lengkapi seluruh kolom kontak dan data penumpang!", "warning");
+        return;
+      }
+
+      if (!cEmail.includes("@")) {
+        toast("Masukkan format email yang valid!", "warning");
+        return;
+      }
+
+      // Call API /api/booking
+      const bookingPayload = {
+        schedule_id: scheduleId,
+        passenger_name: pName,
+        passenger_phone: cPhone,
+        passenger_email: cEmail,
+        passenger_id_number: pId,
+        seat_numbers: selectedSeats.join(",")
+      };
+
+      try {
+        const response = await fetch('/api/booking', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(bookingPayload)
+        });
+
+        const resData = await response.json();
+        
+        if (resData.success) {
+          localStorage.setItem("bookingCode", resData.booking_code);
+          localStorage.setItem("bookingTotal", resData.total_price || totalPayment);
+          toast("Pemesanan berhasil dibuat! Mengalihkan ke pembayaran...", "success");
+          setTimeout(() => {
+            window.location.href = "payment.html";
+          }, 1000);
+        } else {
+          toast(resData.message || "Gagal membuat pemesanan", "error");
+        }
+      } catch (err) {
+        // Fallback for demo in case MySQL server isn't connected
+        console.error("Booking API Error:", err);
+        
+        // Generate beautiful mockup booking details
+        const mockCode = "GB" + Math.floor(10000000 + Math.random() * 90000000);
+        localStorage.setItem("bookingCode", mockCode);
+        localStorage.setItem("bookingTotal", totalPayment);
+        
+        toast("Koneksi server lokal terputus. Menggunakan Mode Demo: Reservasi berhasil dibuat!", "info");
+        setTimeout(() => {
+          window.location.href = "payment.html";
+        }, 1200);
+      }
+    }
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>

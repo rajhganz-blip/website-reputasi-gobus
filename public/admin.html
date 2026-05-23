@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin Panel - GoBus</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  body { display: flex; background: var(--bg); margin: 0; }
+  .sidebar { width: 250px; background: var(--card); border-right: 1px solid var(--border); height: 100vh; position: sticky; top: 0; padding: 1.5rem 0; display: flex; flex-direction: column; }
+  .sidebar .logo { padding: 0 1.5rem 1.5rem; border-bottom: 1px solid var(--border); margin-bottom: 1rem; }
+  .nav-item { padding: 1rem 1.5rem; color: var(--muted); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 0.8rem; border-left: 3px solid transparent; }
+  .nav-item:hover, .nav-item.active { background: rgba(232, 66, 10, 0.1); color: var(--text); border-left-color: var(--primary); }
+  .main-content { flex: 1; padding: 2rem; overflow-y: auto; height: 100vh; }
+  .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+  .stat-card { background: var(--card); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); }
+  .stat-card h4 { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.5rem; }
+  .stat-card .val { font-size: 1.8rem; font-weight: 700; color: var(--text); }
+  .table-container { background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 2rem; }
+  table { width: 100%; border-collapse: collapse; text-align: left; }
+  th, td { padding: 1rem; border-bottom: 1px solid var(--border); }
+  th { background: rgba(255,255,255,0.02); font-weight: 600; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; }
+  td { font-size: 0.9rem; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .badge { padding: 0.3rem 0.6rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+  .badge.pending { background: rgba(255, 214, 0, 0.15); color: var(--warning); }
+  .badge.paid { background: rgba(0, 200, 83, 0.15); color: var(--success); }
+  .badge.failed { background: rgba(255, 23, 68, 0.15); color: var(--danger); }
+  
+  /* LOGIN OVERLAY */
+  #loginOverlay { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; align-items: center; justify-content: center; }
+  .login-box { background: var(--card); padding: 2.5rem; border-radius: 16px; border: 1px solid var(--border); width: 100%; max-width: 400px; text-align: center; }
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- LOGIN -->
+<div id="loginOverlay">
+  <div class="login-box">
+    <div class="logo" style="margin-bottom: 2rem; justify-content: center;">🚌 Go<span>Bus</span> Admin</div>
+    <form onsubmit="handleLogin(event)" style="text-align: left;">
+      <div class="form-group" style="margin-bottom: 1rem;">
+        <label>Username</label>
+        <input type="text" id="username" required>
+      </div>
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label>Password</label>
+        <input type="password" id="password" required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width: 100%;">Login Masuk</button>
+      <a href="index.html" class="btn btn-secondary" style="width: 100%; margin-top: 0.5rem; text-align: center;">Kembali ke Beranda</a>
+    </form>
+  </div>
+</div>
+
+<div class="sidebar">
+  <div class="logo">🚌 Go<span>Bus</span></div>
+  <div class="nav-item active" onclick="switchTab('dashboard', this)">📊 Dashboard</div>
+  <div class="nav-item" onclick="switchTab('bookings', this)">🎫 Pesanan</div>
+  <div class="nav-item" onclick="switchTab('routes', this)">🛣️ Rute</div>
+  <div class="nav-item" onclick="switchTab('schedules', this)">🗓️ Jadwal</div>
+  <div class="nav-item" onclick="switchTab('discounts', this)">🏷️ Promo</div>
+  <div class="nav-item" onclick="switchTab('revenue', this)">💰 Pendapatan</div>
+  <div class="nav-item" onclick="switchTab('settings', this)">⚙️ Pengaturan</div>
+  <div style="flex:1"></div>
+  <div class="nav-item" style="color:var(--danger)" onclick="logout()">🚪 Logout</div>
+</div>
+
+<div class="main-content">
+  <div class="top-header">
+    <h2 id="pageTitle">Dashboard</h2>
+    <div id="adminName" style="color:var(--muted)">Admin</div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="tab-dashboard" class="tab-content">
+    <div class="stat-grid">
+      <div class="stat-card"><h4>Pendapatan Hari Ini</h4><div class="val" id="statTodayRev">Rp0</div></div>
+      <div class="stat-card"><h4>Total Pendapatan</h4><div class="val" id="statTotalRev">Rp0</div></div>
+      <div class="stat-card"><h4>Pesanan Menunggu</h4><div class="val" id="statPending" style="color:var(--warning)">0</div></div>
+      <div class="stat-card"><h4>Jadwal Hari Ini</h4><div class="val" id="statSchedules">0</div></div>
+    </div>
+    
+    <h3>Pesanan Terbaru</h3>
+    <div class="table-container" style="margin-top:1rem">
+      <table>
+        <thead><tr><th>Kode</th><th>Penumpang</th><th>Rute</th><th>Total</th><th>Status</th></tr></thead>
+        <tbody id="recentBookingsTbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- BOOKINGS -->
+  <div id="tab-bookings" class="tab-content hidden">
+    <div style="display:flex; justify-content:space-between; margin-bottom:1rem">
+      <input type="text" id="searchBooking" placeholder="Cari kode/nama..." class="form-group" style="padding:0.5rem; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:6px; width:250px" onkeyup="if(event.key==='Enter') loadBookings()">
+      <select id="filterStatus" class="form-group" style="padding:0.5rem; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:6px" onchange="loadBookings()">
+        <option value="">Semua Status</option>
+        <option value="pending">Pending</option>
+        <option value="paid">Lunas</option>
+        <option value="failed">Dibatalkan</option>
+      </select>
+    </div>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>Kode</th><th>Tgl Pesan</th><th>Penumpang</th><th>Rute / Tgl</th><th>Total</th><th>Bukti</th><th>Status</th><th>Aksi</th></tr></thead>
+        <tbody id="bookingsTbody"></tbody>
+      </table>
+    </div>
+  </div>
+  
+  <!-- SETTINGS -->
+  <div id="tab-settings" class="tab-content hidden">
+    <div class="stat-card" style="max-width: 500px;">
+      <h3>Pengaturan Pembayaran QRIS</h3>
+      <p style="color:var(--muted); font-size:0.9rem; margin-bottom:1rem;">Upload kode QRIS yang akan digunakan untuk menerima pembayaran dari pelanggan.</p>
+      <div class="upload-area" onclick="document.getElementById('adminQrisFile').click()">
+        <input type="file" id="adminQrisFile" accept="image/*" onchange="uploadAdminQris(this)">
+        <div class="upload-icon">📲</div>
+        <div class="upload-text">Klik untuk upload QRIS Global</div>
+      </div>
+      <div id="globalQrisPreview" style="margin-top:1rem; text-align:center;"></div>
+    </div>
+  </div>
+
+  <!-- REVENUE TAB -->
+  <div id="tab-revenue" class="tab-content hidden">
+    <div class="stat-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 2rem;">
+      <div class="stat-card">
+        <h3>💰 Laporan Keuangan Bulanan</h3>
+        <p style="color:var(--muted); font-size:0.9rem; margin-bottom:1rem;">Visualisasi data total penjualan tiket per bulan.</p>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Bulan</th>
+                <th>Total Tiket Terjual</th>
+                <th>Pendapatan Bersih</th>
+              </tr>
+            </thead>
+            <tbody id="revenueMonthlyTbody">
+              <!-- Populated by admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="stat-card">
+        <h3>🛣️ Performasi Rute Terpopuler</h3>
+        <p style="color:var(--muted); font-size:0.9rem; margin-bottom:1rem;">Rute perjalanan dengan penjualan tiket tertinggi.</p>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Rute Perjalanan</th>
+                <th>Total Pesanan</th>
+                <th>Pendapatan Rute</th>
+              </tr>
+            </thead>
+            <tbody id="revenueRouteTbody">
+              <!-- Populated by admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROUTES TAB -->
+  <div id="tab-routes" class="tab-content hidden">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+      <h3>Manajemen Rute</h3>
+      <button class="btn btn-primary btn-sm" onclick="toggleRouteForm()">➕ Tambah Rute Baru</button>
+    </div>
+
+    <!-- Add Route Form Card (Hidden by Default) -->
+    <div id="routeFormCard" class="stat-card hidden" style="margin-bottom:2rem; max-width:600px;">
+      <h4 id="routeFormTitle">Tambah Rute Baru</h4>
+      <form onsubmit="handleSaveRoute(event)" style="margin-top:1rem;">
+        <input type="hidden" id="formRouteId">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+          <div class="form-group">
+            <label>Kota Asal</label>
+            <input type="text" id="routeOrigin" required placeholder="Contoh: Jakarta">
+          </div>
+          <div class="form-group">
+            <label>Kota Tujuan</label>
+            <input type="text" id="routeDestination" required placeholder="Contoh: Surabaya">
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+          <div class="form-group">
+            <label>Jarak (Km)</label>
+            <input type="number" id="routeDistance" required placeholder="Contoh: 790">
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="routeActive">
+              <option value="1">Aktif</option>
+              <option value="0">Non-Aktif</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:1.5rem;">
+          <label>Deskripsi Rute</label>
+          <input type="text" id="routeDescription" placeholder="Deskripsi singkat rute atau tol yang dilewati">
+        </div>
+        <div style="display:flex; gap:0.75rem;">
+          <button type="submit" class="btn btn-primary">Simpan Rute</button>
+          <button type="button" class="btn btn-secondary" onclick="toggleRouteForm(false)">Batal</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Rute Perjalanan</th>
+            <th>Jarak</th>
+            <th>Deskripsi</th>
+            <th>Status</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="routesTbody">
+          <!-- Populated by admin.js -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SCHEDULES TAB -->
+  <div id="tab-schedules" class="tab-content hidden">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+      <h3>Manajemen Jadwal & Harga</h3>
+      <button class="btn btn-primary btn-sm" onclick="toggleScheduleForm()">➕ Tambah Jadwal Baru</button>
+    </div>
+
+    <!-- Add Schedule Form Card -->
+    <div id="scheduleFormCard" class="stat-card hidden" style="margin-bottom:2rem; max-width:700px;">
+      <h4 id="scheduleFormTitle">Tambah Jadwal Keberangkatan</h4>
+      <form onsubmit="handleSaveSchedule(event)" style="margin-top:1rem;">
+        <input type="hidden" id="formScheduleId">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+          <div class="form-group">
+            <label>Pilih Rute</label>
+            <select id="schedRouteId" required>
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Pilih Armada Bus</label>
+            <select id="schedBusId" required>
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; margin-bottom:1rem;">
+          <div class="form-group">
+            <label>Tanggal</label>
+            <input type="date" id="schedDate" required>
+          </div>
+          <div class="form-group">
+            <label>Jam Berangkat</label>
+            <input type="time" id="schedDepTime" required>
+          </div>
+          <div class="form-group">
+            <label>Jam Tiba (Estimasi)</label>
+            <input type="time" id="schedArrTime" required>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem;">
+          <div class="form-group">
+            <label>Harga Tiket (Base Price)</label>
+            <input type="number" id="schedPrice" required placeholder="Contoh: 385000">
+          </div>
+          <div class="form-group">
+            <label>Status Jadwal</label>
+            <select id="schedStatus">
+              <option value="active">Aktif</option>
+              <option value="cancelled">Dibatalkan</option>
+              <option value="completed">Selesai</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex; gap:0.75rem;">
+          <button type="submit" class="btn btn-primary">Simpan Jadwal</button>
+          <button type="button" class="btn btn-secondary" onclick="toggleScheduleForm(false)">Batal</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Armada Bus</th>
+            <th>Rute</th>
+            <th>Tgl & Jam</th>
+            <th>Harga Tiket</th>
+            <th>Sisa Kursi</th>
+            <th>Status</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="schedulesTbody">
+          <!-- Populated by admin.js -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DISCOUNTS / PROMO TAB -->
+  <div id="tab-discounts" class="tab-content hidden">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+      <h3>Manajemen Promo & Diskon</h3>
+      <button class="btn btn-primary btn-sm" onclick="toggleDiscountForm()">➕ Tambah Promo Baru</button>
+    </div>
+
+    <!-- Add Promo Form Card -->
+    <div id="discountFormCard" class="stat-card hidden" style="margin-bottom:2rem; max-width:600px;">
+      <h4 id="discountFormTitle">Tambah Promo Baru</h4>
+      <form onsubmit="handleSaveDiscount(event)" style="margin-top:1rem;">
+        <input type="hidden" id="formDiscountId">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+          <div class="form-group">
+            <label>Kode Promo</label>
+            <input type="text" id="discCode" required placeholder="Contoh: GOBUSMERDEKA">
+          </div>
+          <div class="form-group">
+            <label>Tipe Diskon</label>
+            <select id="discType">
+              <option value="percentage">Persentase (%)</option>
+              <option value="fixed">Nominal Tetap (Rp)</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+          <div class="form-group">
+            <label>Nilai Diskon</label>
+            <input type="number" id="discValue" required placeholder="Contoh: 10 atau 50000">
+          </div>
+          <div class="form-group">
+            <label>Min. Pembelian (Rp)</label>
+            <input type="number" id="discMinPurchase" required placeholder="Contoh: 100000">
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+          <div class="form-group">
+            <label>Berlaku Dari</label>
+            <input type="date" id="discFrom" required>
+          </div>
+          <div class="form-group">
+            <label>Berlaku Hingga</label>
+            <input type="date" id="discUntil" required>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem;">
+          <div class="form-group">
+            <label>Kuota Penggunaan</label>
+            <input type="number" id="discMaxUses" required placeholder="Contoh: 100">
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="discActive">
+              <option value="1">Aktif</option>
+              <option value="0">Non-Aktif</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:1.5rem;">
+          <label>Deskripsi Promo</label>
+          <input type="text" id="discDescription" placeholder="Deskripsi singkat mengenai promo">
+        </div>
+        <div style="display:flex; gap:0.75rem;">
+          <button type="submit" class="btn btn-primary">Simpan Promo</button>
+          <button type="button" class="btn btn-secondary" onclick="toggleDiscountForm(false)">Batal</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Kode</th>
+            <th>Tipe</th>
+            <th>Nilai</th>
+            <th>Min. Beli</th>
+            <th>Kuota Terpakai</th>
+            <th>Berlaku</th>
+            <th>Status</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="discountsTbody">
+          <!-- Populated by admin.js -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL BUKTI PEMBAYARAN -->
+<div class="modal-overlay hidden" id="proofModal" style="z-index: 2000;">
+  <div class="modal" style="max-width:500px">
+    <button class="close-btn" onclick="document.getElementById('proofModal').classList.add('hidden')">✕</button>
+    <h3 style="margin-bottom:1rem">Bukti Pembayaran</h3>
+    <img id="proofImageFull" src="" style="width:100%; border-radius:8px; display:block; margin:0 auto;">
+    <div style="display:flex; gap:1rem; justify-content:center; margin-top:1.5rem">
+      <button class="btn btn-danger" id="btnRejectPayment">Tolak</button>
+      <button class="btn btn-success" id="btnConfirmPayment">Konfirmasi (Lunas)</button>
+    </div>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>
